@@ -1,0 +1,376 @@
+/* Дневник тренировки — мобильный интерфейс, адаптирован под тему Telegram. */
+
+:root {
+  --bg: var(--tg-theme-bg-color, #0f1115);
+  --surface: var(--tg-theme-secondary-bg-color, #1a1d24);
+  --card: var(--tg-theme-section-bg-color, #21242d);
+  --text: var(--tg-theme-text-color, #f2f4f8);
+  --hint: var(--tg-theme-hint-color, #8b93a3);
+  --link: var(--tg-theme-link-color, #6ab3ff);
+  --accent: var(--tg-theme-button-color, #3d8bff);
+  --accent-text: var(--tg-theme-button-text-color, #ffffff);
+  --danger: var(--tg-theme-destructive-text-color, #ff5c5c);
+  --radius: 14px;
+  --gap: 12px;
+}
+
+:root[data-scheme='light'] {
+  --bg: var(--tg-theme-bg-color, #f0f2f5);
+  --surface: var(--tg-theme-secondary-bg-color, #ffffff);
+  --card: var(--tg-theme-section-bg-color, #ffffff);
+  --text: var(--tg-theme-text-color, #14161a);
+  --hint: var(--tg-theme-hint-color, #707784);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.app {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 16px 14px calc(28px + env(safe-area-inset-bottom));
+  min-height: 100vh;
+}
+
+/* --- Кнопки --- */
+.btn {
+  appearance: none;
+  border: none;
+  border-radius: var(--radius);
+  padding: 13px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  cursor: pointer;
+  transition: transform 0.06s ease, opacity 0.15s ease;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+.btn-block {
+  display: block;
+  width: 100%;
+  margin-top: var(--gap);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--hint);
+  font-weight: 500;
+}
+.btn-danger {
+  color: var(--danger);
+}
+
+/* --- Экран импорта --- */
+.hero-title {
+  font-size: 26px;
+  margin: 6px 0 8px;
+}
+.hero-sub {
+  color: var(--hint);
+  margin: 0 0 18px;
+  font-size: 15px;
+}
+.import-area,
+.summary-area {
+  width: 100%;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: 14px;
+  font-size: 15px;
+  font-family: inherit;
+  resize: vertical;
+}
+.import-area:focus,
+.summary-area:focus,
+.text-input:focus,
+.set-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.import-error {
+  color: var(--danger);
+  font-size: 14px;
+  margin: 8px 2px 0;
+}
+
+/* --- Шапка тренировки --- */
+.wk-header {
+  margin-bottom: 12px;
+}
+.wk-title {
+  font-size: 18px;
+  font-weight: 700;
+  word-break: break-word;
+}
+.wk-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+  color: var(--hint);
+  font-size: 13px;
+}
+.bw-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.bw-input {
+  width: 64px;
+  padding: 6px 8px;
+  text-align: center;
+}
+.wk-progress {
+  white-space: nowrap;
+}
+
+/* --- Лента упражнений (чипы) --- */
+.chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 2px 10px;
+  scrollbar-width: none;
+}
+.chips::-webkit-scrollbar {
+  display: none;
+}
+.chip {
+  flex: 0 0 auto;
+  min-width: 46px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.chip-superset {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.chip-done {
+  background: color-mix(in srgb, #2ec16a 24%, var(--surface));
+}
+.chip-warmup {
+  opacity: 0.7;
+}
+.chip-active {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+/* --- Карточка упражнения --- */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.superset-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+.ex-name {
+  font-size: 19px;
+  margin: 0 0 12px;
+  line-height: 1.3;
+}
+.ex-task {
+  color: var(--hint);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.ex-record {
+  color: var(--hint);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.ex-hint {
+  color: var(--hint);
+}
+
+.video-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.btn-video {
+  background: color-mix(in srgb, var(--link) 18%, var(--surface));
+  color: var(--link);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+/* --- Поля --- */
+.field {
+  display: block;
+  margin: 12px 0;
+}
+.field-label {
+  display: block;
+  font-size: 13px;
+  color: var(--hint);
+  margin-bottom: 6px;
+}
+.text-input {
+  width: 100%;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 11px 12px;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+/* --- Подходы --- */
+.sets {
+  margin-top: 6px;
+}
+.set-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+.set-index {
+  width: 22px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--hint);
+}
+.set-fields {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.set-sep,
+.set-unit {
+  color: var(--hint);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.stepper {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.step-btn {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 22px;
+  font-weight: 700;
+  width: 36px;
+  height: 44px;
+  cursor: pointer;
+}
+.step-btn:active {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.set-input {
+  width: 46px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+  padding: 10px 0;
+}
+.set-remove {
+  border: none;
+  background: transparent;
+  color: var(--hint);
+  font-size: 22px;
+  width: 30px;
+  cursor: pointer;
+}
+
+/* --- Таймер отдыха --- */
+.rest-timer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.timer-display {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 58px;
+  color: var(--hint);
+}
+.rest-timer.running .timer-display {
+  color: var(--accent);
+}
+.btn-chip {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 14px;
+}
+.btn-stop {
+  color: var(--danger);
+}
+
+/* --- Навигация --- */
+.wk-nav {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+.btn-nav {
+  flex: 1;
+}
+
+/* --- Итог --- */
+.summary-title {
+  margin: 4px 0 12px;
+}
+.summary-status {
+  color: var(--hint);
+  font-size: 14px;
+  min-height: 20px;
+  margin: 8px 2px;
+}
