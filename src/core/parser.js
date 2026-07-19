@@ -60,7 +60,8 @@ function newExercise(parsedNumber) {
     plannedSets: 0,
     repRange: '',
     supersetLabel: null,
-    supersetSize: 0
+    supersetSize: 0,
+    supersetGroup: 0
   };
 }
 
@@ -92,7 +93,8 @@ export function parseWorkout(text) {
   };
 
   let current = null;
-  let pendingSuperset = null; // {label, size, remaining}
+  let pendingSuperset = null; // {label, size, remaining, group}
+  let supersetCount = 0; // сквозной номер группы суперсета для раскраски
 
   const push = () => {
     if (current) {
@@ -127,7 +129,8 @@ export function parseWorkout(text) {
     if (superset) {
       push();
       const size = parseInt(superset[1], 10);
-      pendingSuperset = { label: line, size, remaining: size };
+      supersetCount += 1;
+      pendingSuperset = { label: line, size, remaining: size, group: supersetCount };
       continue;
     }
 
@@ -137,6 +140,7 @@ export function parseWorkout(text) {
       current = newExercise(parsedNumber);
       if (pendingSuperset && pendingSuperset.remaining > 0) {
         current.supersetSize = pendingSuperset.size;
+        current.supersetGroup = pendingSuperset.group;
         if (pendingSuperset.remaining === pendingSuperset.size) {
           current.supersetLabel = pendingSuperset.label;
         }

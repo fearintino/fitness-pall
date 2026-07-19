@@ -6,6 +6,7 @@ import { updateExercise } from '../app/state.js';
 import { openLink, haptic } from '../services/telegram.js';
 import { renderRestTimer } from './restTimer.js';
 import { refreshStatus } from './workoutView.js';
+import { supersetColor } from '../core/palette.js';
 
 // silent: правки при вводе не перерисовывают карточку (иначе теряется фокус
 // поля и на телефоне закрывается клавиатура). Данные всё равно сохраняются.
@@ -115,8 +116,13 @@ export function renderExerciseCard(ex, rerender) {
   const children = [];
 
   if (ex.supersetSize) {
+    const color = supersetColor(ex.supersetGroup);
     children.push(
-      el('div', { class: 'superset-badge', text: ex.supersetLabel || `Суперсет · ${ex.supersetSize} упр.` })
+      el('div', {
+        class: 'superset-badge',
+        style: color ? `--ss: ${color}` : null,
+        text: ex.supersetLabel || `Суперсет · ${ex.supersetSize} упр.`
+      })
     );
   }
 

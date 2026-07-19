@@ -3,6 +3,7 @@
 import { el } from './dom.js';
 import { getState, goTo, next, prev, updateWorkout, setView } from '../app/state.js';
 import { haptic } from '../services/telegram.js';
+import { supersetColor } from '../core/palette.js';
 
 function isFilled(ex) {
   return (ex.todaySets || []).some((s) => String(s.weight).trim() && String(s.reps).trim());
@@ -57,9 +58,11 @@ function chips(workout, index) {
     if (ex.supersetSize) cls.push('chip-superset');
     if (needsInput(ex) && isFilled(ex)) cls.push('chip-done');
     if (!needsInput(ex)) cls.push('chip-warmup');
+    const color = supersetColor(ex.supersetGroup);
     return el('button', {
       class: cls.join(' '),
       dataset: { index: String(i) },
+      style: color ? `--ss: ${color}` : null,
       onClick: () => {
         haptic('selection');
         goTo(i);

@@ -59,6 +59,29 @@ describe('parseWorkout', () => {
     expect(model.duration).toContain('?');
   });
 
+  it('размечает первую группу суперсета номером 1', () => {
+    expect(model.exercises[3].supersetGroup).toBe(1);
+    expect(model.exercises[4].supersetGroup).toBe(1);
+    expect(model.exercises[1].supersetGroup).toBe(0);
+  });
+
+  it('нумерует разные суперсеты разными группами', () => {
+    const text = [
+      'Суперсет 2 упражнения:',
+      '1️⃣ A',
+      '▪️ 3 подхода по 10 повторений',
+      '2️⃣ B',
+      '▪️ 3 подхода по 10 повторений',
+      'Суперсет 2 упражнения:',
+      '3️⃣ C',
+      '▪️ 3 подхода по 10 повторений',
+      '4️⃣ D',
+      '▪️ 3 подхода по 10 повторений'
+    ].join('\n');
+    const groups = parseWorkout(text).exercises.map((e) => e.supersetGroup);
+    expect(groups).toEqual([1, 1, 2, 2]);
+  });
+
   it('устойчив к пустому вводу', () => {
     const empty = parseWorkout('');
     expect(empty.exercises).toEqual([]);
