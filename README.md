@@ -47,14 +47,22 @@ npm test           # прогон тестов
 npm run coverage   # тесты + покрытие (порог 70%)
 ```
 
-## Деплой на GitHub Pages
+## Деплой на GitHub Pages (через GitHub Actions)
 
-1. Залить репозиторий на GitHub.
-2. Собрать статику: `BASE_PATH=/имя-репозитория/ npm run build` — результат в `dist/`.
-   (Либо выложить корень репозитория как есть — приложение работает без сборки.)
-3. В настройках репозитория включить GitHub Pages на ветку/папку с файлами.
-4. Полученный `https://<user>.github.io/<repo>/` указать в BotFather:
+Деплой автоматический: на каждый push в `main` workflow `.github/workflows/deploy.yml`
+прогоняет тесты, собирает проект Vite (с хешами в именах файлов — это сбрасывает
+кеш браузера и Telegram) и публикует `dist/` в Pages.
+
+Разовая настройка:
+1. В репозитории: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+2. Дождаться зелёного прогона во вкладке **Actions**.
+3. URL `https://<user>.github.io/<repo>/` указать в BotFather:
    `/newapp` → выбрать бота → задать URL мини-приложения.
+
+Базовый путь задаётся переменной `BASE_PATH` (в workflow — `/fitness-pall/`);
+при другом имени репозитория поменять её там же.
+
+Локальная сборка для проверки: `BASE_PATH=/fitness-pall/ npm run build`.
 
 ## Как пользоваться
 
