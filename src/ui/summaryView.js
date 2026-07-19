@@ -33,7 +33,7 @@ export function renderSummary() {
     placeholder: '? ч ? мин',
     value: workout.duration || '',
     onInput: (e) => {
-      updateWorkout({ duration: e.target.value });
+      updateWorkout({ duration: e.target.value }, { silent: true });
       output.value = serializeWorkout(getState().workout);
     }
   });

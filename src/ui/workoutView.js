@@ -12,22 +12,40 @@ function needsInput(ex) {
   return ex.plannedSets > 0 || (ex.todaySets && ex.todaySets.length);
 }
 
-function header(workout) {
+function progressText(workout) {
   const done = workout.exercises.filter((e) => needsInput(e) && isFilled(e)).length;
   const total = workout.exercises.filter(needsInput).length;
+  return `Заполнено ${done}/${total}`;
+}
 
+/**
+ * Точечно обновляет подсветку чипов и счётчик прогресса на уже отрисованном
+ * экране — без пересборки полей ввода, чтобы не терять фокус при вводе.
+ */
+export function refreshStatus() {
+  const { workout } = getState();
+  if (!workout) return;
+  const chipEls = document.querySelectorAll('.chip');
+  workout.exercises.forEach((ex, i) => {
+    if (chipEls[i]) chipEls[i].classList.toggle('chip-done', needsInput(ex) && isFilled(ex));
+  });
+  const progress = document.querySelector('.wk-progress');
+  if (progress) progress.textContent = progressText(workout);
+}
+
+function header(workout) {
   const bodyweight = el('input', {
     class: 'text-input bw-input',
     placeholder: '—',
     value: workout.bodyweight || '',
-    onInput: (e) => updateWorkout({ bodyweight: e.target.value })
+    onInput: (e) => updateWorkout({ bodyweight: e.target.value }, { silent: true })
   });
 
   return el('div', { class: 'wk-header' }, [
     el('div', { class: 'wk-title', text: workout.title || 'Тренировка' }),
     el('div', { class: 'wk-meta' }, [
       el('label', { class: 'bw-field' }, [el('span', { text: 'Собств. вес' }), bodyweight]),
-      el('span', { class: 'wk-progress', text: `Заполнено ${done}/${total}` })
+      el('span', { class: 'wk-progress', text: progressText(workout) })
     ])
   ]);
 }

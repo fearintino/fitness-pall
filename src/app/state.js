@@ -49,20 +49,23 @@ export function prev() {
   goTo(state.index - 1);
 }
 
-/** Обновляет текущее упражнение (мутация полей) и сохраняет. */
-export function updateExercise(patch) {
+/**
+ * Обновляет текущее упражнение (мутация полей) и сохраняет.
+ * silent=true — не перерисовывать (для ввода текста, чтобы не терять фокус).
+ */
+export function updateExercise(patch, { silent = false } = {}) {
   const ex = state.workout?.exercises[state.index];
   if (!ex) return;
   Object.assign(ex, patch);
   persist();
-  emit();
+  if (!silent) emit();
 }
 
-export function updateWorkout(patch) {
+export function updateWorkout(patch, { silent = false } = {}) {
   if (!state.workout) return;
   Object.assign(state.workout, patch);
   persist();
-  emit();
+  if (!silent) emit();
 }
 
 export function reset() {

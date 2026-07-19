@@ -5,52 +5,56 @@ import { ensureSets } from '../core/sets.js';
 import { updateExercise } from '../app/state.js';
 import { openLink, haptic } from '../services/telegram.js';
 import { renderRestTimer } from './restTimer.js';
+import { refreshStatus } from './workoutView.js';
 
-function commitSets(ex, sets) {
-  updateExercise({ todaySets: sets.map((s) => ({ ...s })) });
+// silent: правки при вводе не перерисовывают карточку (иначе теряется фокус
+// поля и на телефоне закрывается клавиатура). Данные всё равно сохраняются.
+function commitSets(ex, sets, silent = true) {
+  updateExercise({ todaySets: sets.map((s) => ({ ...s })) }, { silent });
 }
 
-function stepper(value, onChange) {
+// onValue — правка значения (тихо, без перерисовки).
+// onCommit — обновить подсветку статуса (по blur и кнопкам степпера, когда
+// фокус текстового поля не удерживается и клавиатуре ничего не грозит).
+function stepper(value, onValue, onCommit) {
   const input = el('input', {
     class: 'set-input',
     type: 'text',
     inputmode: 'decimal',
     value: value ?? '',
-    onInput: (e) => onChange(e.target.value)
+    onInput: (e) => onValue(e.target.value),
+    onBlur: () => onCommit && onCommit()
   });
-  const dec = el('button', {
-    class: 'step-btn',
-    text: '−',
-    onClick: () => {
-      const n = parseFloat(String(input.value).replace(',', '.')) || 0;
-      input.value = Math.max(0, n - 1);
-      onChange(input.value);
-      haptic('selection');
-    }
-  });
-  const inc = el('button', {
-    class: 'step-btn',
-    text: '+',
-    onClick: () => {
-      const n = parseFloat(String(input.value).replace(',', '.')) || 0;
-      input.value = n + 1;
-      onChange(input.value);
-      haptic('selection');
-    }
-  });
+  const step = (delta) => {
+    const n = parseFloat(String(input.value).replace(',', '.')) || 0;
+    input.value = Math.max(0, n + delta);
+    onValue(input.value);
+    if (onCommit) onCommit();
+    haptic('selection');
+  };
+  const dec = el('button', { class: 'step-btn', text: '−', onClick: () => step(-1) });
+  const inc = el('button', { class: 'step-btn', text: '+', onClick: () => step(1) });
   return el('div', { class: 'stepper' }, [dec, input, inc]);
 }
 
 function setRow(ex, sets, i, rerender) {
   const set = sets[i];
-  const weight = stepper(set.weight, (v) => {
-    sets[i].weight = v;
-    commitSets(ex, sets);
-  });
-  const reps = stepper(set.reps, (v) => {
-    sets[i].reps = v;
-    commitSets(ex, sets);
-  });
+  const weight = stepper(
+    set.weight,
+    (v) => {
+      sets[i].weight = v;
+      commitSets(ex, sets);
+    },
+    refreshStatus
+  );
+  const reps = stepper(
+    set.reps,
+    (v) => {
+      sets[i].reps = v;
+      commitSets(ex, sets);
+    },
+    refreshStatus
+  );
   const remove = el('button', {
     class: 'set-remove',
     text: '×',
@@ -59,6 +63,7 @@ function setRow(ex, sets, i, rerender) {
       sets.splice(i, 1);
       commitSets(ex, sets);
       rerender();
+      refreshStatus();
     }
   });
   return el('div', { class: 'set-row' }, [
@@ -82,6 +87,7 @@ function setsBlock(ex, rerender) {
       sets.push({ weight: '', reps: '' });
       commitSets(ex, sets);
       rerender();
+      refreshStatus();
     }
   }, ['+ подход']);
   return el('div', { class: 'sets' }, [...rows, add]);
@@ -127,7 +133,7 @@ export function renderExerciseCard(ex, rerender) {
       class: 'text-input',
       placeholder: 'Разминка (напр. 20/10 40/10)',
       value: ex.warmup || '',
-      onInput: (e) => updateExercise({ warmup: e.target.value })
+      onInput: (e) => updateExercise({ warmup: e.target.value }, { silent: true })
     });
     children.push(el('label', { class: 'field' }, [el('span', { class: 'field-label', text: 'Разминка' }), warmup]));
 
