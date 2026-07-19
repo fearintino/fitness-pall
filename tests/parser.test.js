@@ -82,6 +82,42 @@ describe('parseWorkout', () => {
     expect(groups).toEqual([1, 1, 2, 2]);
   });
 
+  it('распознаёт 🔟 и держит три разных суперсета', () => {
+    const text = [
+      '2️⃣ B',
+      '▪️ 3 подхода по 8 повторений',
+      'Суперсет 2 упражнения:',
+      '3️⃣ C',
+      '▪️ 3 подхода по 8 повторений',
+      '4️⃣ D',
+      '▪️ 3 подхода по 8 повторений',
+      'Суперсет 4 упражнения:',
+      '5️⃣ E',
+      '▪️ 3 подхода по 10 повторений',
+      '6️⃣ F',
+      '▪️ 3 подхода по 10 повторений',
+      '7️⃣ G',
+      '▪️ 3 подхода по 6 повторений',
+      '8️⃣ H',
+      '▪️ 3 подхода по 6 повторений',
+      '9️⃣ I',
+      '▪️ 4 подхода по 6 повторений',
+      'Суперсет 2 упражнения:',
+      '🔟 J',
+      '▪️ 3 подхода по 15 повторений',
+      '1️⃣1️⃣ K',
+      '▪️ 3 подхода по 20 повторений'
+    ].join('\n');
+    const ex = parseWorkout(text).exercises;
+    expect(ex).toHaveLength(10);
+    const ten = ex.find((e) => e.number === 10);
+    expect(ten.name).toBe('J');
+    expect(ten.numberDisplay).toBe('🔟');
+    // Три суперсета -> три разных номера группы; одиночное 9 вне суперсета.
+    expect(ex.map((e) => e.supersetGroup)).toEqual([0, 1, 1, 2, 2, 2, 2, 0, 3, 3]);
+    expect(new Set(ex.map((e) => e.supersetGroup).filter(Boolean)).size).toBe(3);
+  });
+
   it('устойчив к пустому вводу', () => {
     const empty = parseWorkout('');
     expect(empty.exercises).toEqual([]);

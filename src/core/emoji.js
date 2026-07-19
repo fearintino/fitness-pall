@@ -3,12 +3,14 @@
 
 const VARIATION_SELECTOR = '️';
 const COMBINING_KEYCAP = '⃣';
+// Десятка у тренера часто идёт единым эмодзи 🔟 (U+1F51F), а не парой 1️⃣0️⃣.
+const TEN = '🔟';
 
-// Последовательность keycap-цифр в начале строки: "1️⃣0️⃣ Название"
-const LEADING_KEYCAP = /^\s*((?:[0-9]️?⃣)+)/;
+// Начало строки: либо 🔟, либо последовательность keycap-цифр "1️⃣0️⃣ Название".
+const LEADING_KEYCAP = /^\s*(🔟|(?:[0-9]️?⃣)+)/;
 
 /**
- * Разбирает ведущие keycap-цифры строки.
+ * Разбирает ведущий номер упражнения (keycap-цифры или 🔟).
  * @param {string} line
  * @returns {{number: number, display: string, rest: string} | null}
  */
@@ -17,9 +19,9 @@ export function parseLeadingNumber(line) {
   const match = line.match(LEADING_KEYCAP);
   if (!match) return null;
   const display = match[1];
-  const digits = display.replace(/[️⃣]/g, '');
+  const number = display === TEN ? 10 : parseInt(display.replace(/[️⃣]/g, ''), 10);
   return {
-    number: parseInt(digits, 10),
+    number,
     display,
     rest: line.slice(match[0].length).trim()
   };

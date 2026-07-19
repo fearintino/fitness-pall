@@ -19,6 +19,13 @@ describe('parseLeadingNumber', () => {
     expect(r.rest).toBe('Суставная разминка');
   });
 
+  it('читает десятку единым эмодзи 🔟', () => {
+    const r = parseLeadingNumber('🔟 Гиперэкстензии');
+    expect(r.number).toBe(10);
+    expect(r.display).toBe('🔟');
+    expect(r.rest).toBe('Гиперэкстензии');
+  });
+
   it('возвращает null без keycap-цифр', () => {
     expect(parseLeadingNumber('Собственный вес:')).toBeNull();
     expect(parseLeadingNumber(null)).toBeNull();
