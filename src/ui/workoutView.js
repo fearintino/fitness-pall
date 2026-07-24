@@ -107,7 +107,7 @@ function navButtons(workout, index, total) {
   }, [isLast ? 'К отправке →' : 'Дальше →']);
 
   const loop = loopButton(workout.exercises, index);
-  return el('div', { class: 'wk-nav' }, loop ? [back, loop, forward] : [back, forward]);
+  return el('div', { class: loop ? 'wk-nav wk-nav-triple' : 'wk-nav' }, loop ? [back, loop, forward] : [back, forward]);
 }
 
 /**
