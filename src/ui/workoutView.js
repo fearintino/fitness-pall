@@ -4,6 +4,7 @@ import { el } from './dom.js';
 import { getState, goTo, next, prev, updateWorkout, setView } from '../app/state.js';
 import { haptic } from '../services/telegram.js';
 import { supersetColor } from '../core/palette.js';
+import { isLastInSuperset, firstIndexOfSuperset, supersetComplete } from '../core/superset.js';
 
 function isFilled(ex) {
   return (ex.todaySets || []).some((s) => String(s.weight).trim() && String(s.reps).trim());
@@ -72,7 +73,20 @@ function chips(workout, index) {
   return el('div', { class: 'chips' }, items);
 }
 
-function navButtons(index, total) {
+function loopButton(exercises, index) {
+  const ex = exercises[index];
+  if (!isLastInSuperset(exercises, index)) return null;
+  if (supersetComplete(exercises, ex.supersetGroup)) return null;
+  return el('button', {
+    class: 'btn btn-nav btn-loop',
+    onClick: () => {
+      haptic('selection');
+      goTo(firstIndexOfSuperset(exercises, index));
+    }
+  }, ['↺ Новый круг']);
+}
+
+function navButtons(workout, index, total) {
   const back = el('button', {
     class: 'btn btn-nav',
     disabled: index === 0 ? '' : null,
@@ -92,7 +106,8 @@ function navButtons(index, total) {
     }
   }, [isLast ? 'К отправке →' : 'Дальше →']);
 
-  return el('div', { class: 'wk-nav' }, [back, forward]);
+  const loop = loopButton(workout.exercises, index);
+  return el('div', { class: 'wk-nav' }, loop ? [back, loop, forward] : [back, forward]);
 }
 
 /**
@@ -109,7 +124,7 @@ export function renderWorkout(renderCard) {
     header(workout),
     chipStrip,
     card,
-    navButtons(index, total)
+    navButtons(workout, index, total)
   ]);
 
   // Проскроллить активный чип в зону видимости.

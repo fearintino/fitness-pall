@@ -319,6 +319,17 @@ body {
   font-weight: 600;
   padding: 10px 0;
 }
+.set-copy {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 18px;
+  width: 30px;
+  cursor: pointer;
+}
+.set-copy:active {
+  transform: scale(0.9);
+}
 .set-remove {
   border: none;
   background: transparent;
@@ -363,6 +374,11 @@ body {
 }
 .btn-nav {
   flex: 1;
+}
+.btn-loop {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+  white-space: nowrap;
 }
 
 /* --- Итог --- */

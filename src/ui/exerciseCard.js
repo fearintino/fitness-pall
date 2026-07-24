@@ -67,6 +67,21 @@ function setRow(ex, sets, i, rerender) {
       refreshStatus();
     }
   });
+  // Подтянуть вес и повторения из предыдущего подхода (доступно со второго).
+  const copyPrev = i > 0
+    ? el('button', {
+        class: 'set-copy',
+        text: '⇧',
+        title: 'Скопировать из предыдущего подхода',
+        onClick: () => {
+          sets[i] = { weight: sets[i - 1].weight, reps: sets[i - 1].reps };
+          commitSets(ex, sets);
+          rerender();
+          refreshStatus();
+          haptic('selection');
+        }
+      })
+    : null;
   return el('div', { class: 'set-row' }, [
     el('span', { class: 'set-index', text: `${i + 1}` }),
     el('div', { class: 'set-fields' }, [
@@ -75,6 +90,7 @@ function setRow(ex, sets, i, rerender) {
       reps,
       el('span', { class: 'set-unit', text: 'повт' })
     ]),
+    copyPrev,
     remove
   ]);
 }
