@@ -43,12 +43,42 @@ body {
   /* В Telegram высота видимой области приходит через переменную и не совпадает
      с 100vh (мешает шапка). Привязываемся к ней, вне Telegram — dvh/vh. */
   min-height: var(--tg-viewport-stable-height, 100dvh);
+  display: flex;
+  flex-direction: column;
 }
 
 @supports not (height: 100dvh) {
   .app {
     min-height: var(--tg-viewport-stable-height, 100vh);
   }
+}
+
+.view {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* На экране тренировки: колонка ровно по высоте видимой области, навигация
+   закреплена внизу, прокручивается только карточка упражнения. */
+body[data-view='workout'] {
+  overflow: hidden;
+}
+body[data-view='workout'] .app {
+  height: var(--tg-viewport-stable-height, 100dvh);
+  min-height: 0;
+}
+.view-workout {
+  display: flex;
+  flex-direction: column;
+}
+.view-workout .card-slot {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.view-workout .wk-nav {
+  flex: 0 0 auto;
 }
 
 /* --- Кнопки --- */

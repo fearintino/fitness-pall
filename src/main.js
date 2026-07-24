@@ -23,6 +23,9 @@ function renderCurrentCard() {
 
 function render() {
   const { view } = getState();
+  // Текущий экран на body — для CSS: на тренировке навигация закреплена внизу,
+  // а прокручивается только карточка.
+  document.body.dataset.view = view;
   if (view === 'workout') {
     mount(root, renderWorkout(renderCurrentCard));
   } else if (view === 'summary') {
